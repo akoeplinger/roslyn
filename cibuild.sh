@@ -14,6 +14,7 @@ XUNIT_VERSION=2.1.0
 BUILD_CONFIGURATION=Debug
 OS_NAME=$(uname -s)
 USE_CACHE=true
+USE_MONO_BOOTSTRAPPING=false
 MONO_ARGS='--debug=mdb-optimizations --attach=disable'
 
 export MONO_THREADS_PER_CPU=50
@@ -49,6 +50,10 @@ do
         ;;
         --nocache)
         USE_CACHE=false
+        shift 1
+        ;;
+        --use-mono-bootstrapping)
+        USE_MONO_BOOTSTRAPPING=true
         shift 1
         ;;
         *)
@@ -160,6 +165,10 @@ build_roslyn()
     if [ "$OS_NAME" == "Linux" ]; then
         bootstrapArg="/p:CscToolPath=$(pwd)/Binaries/Bootstrap/csccore /p:CscToolExe=csc \
 /p:VbcToolPath=$(pwd)/Binaries/Bootstrap/vbccore /p:VbcToolExe=vbc"
+    fi
+
+    if [ "$USE_MONO_BOOTSTRAPPING" = "true" ]; then
+        bootstrapArg=""
     fi
 
     echo Building CrossPlatform.sln
